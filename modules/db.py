@@ -7,13 +7,19 @@ import hashlib
 import json
 
 def get_collection(bot_name, mongo_uri):
-    client = MongoClient(mongo_uri)
+    # Connect to MongoDB with TLS to prevent SSL handshake issues
+    client = MongoClient(
+        mongo_uri,
+        tls=True,
+        tlsAllowInvalidCertificates=False,
+        serverSelectionTimeoutMS=30000  # 30 seconds
+    )
 
     # Send a ping to confirm a successful connection
     try:
         client.admin.command('ping')
         print("Pinged your deployment. You successfully connected to MongoDB!")
-    except errors.OperationFailure as e:
+    except errors.ServerSelectionTimeoutError as e:
         raise ValueError(f"Failed to connect to MongoDB: {e}")
 
     # Generate a unique collection name using the bot token
@@ -168,7 +174,6 @@ def load_log_channel_id(collection):
     else:
         return -1  # Default value if not found in MongoDB
 
-
 #===================== SAVING AND LOADING BOT RUNNING TIME ===========================
 
 def save_bot_running_time(collection, time_to_add):
@@ -211,4 +216,3 @@ def save_queue_file(collection, file_queue):
 def load_queue_file(collection):
     result = collection.find_one({"type": "file_queue"})
     return result['file_queue_data'] if result else []
-
