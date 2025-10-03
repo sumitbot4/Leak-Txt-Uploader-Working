@@ -1,5 +1,4 @@
 FROM python:3.12-slim-bookworm
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && apt-get upgrade -y \
@@ -8,6 +7,7 @@ RUN apt-get update -y && apt-get upgrade -y \
        python3-dev \
        gcc \
        libffi-dev \
+       libssl-dev \
        ffmpeg \
        aria2 \
        python3-pip \
